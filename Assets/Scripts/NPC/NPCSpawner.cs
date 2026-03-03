@@ -8,42 +8,58 @@ public class NPCSpawner : MonoBehaviour
     [SerializeField] private GameObject npcPrefab;
 
     [Header("Slots")]
-    [SerializeField] private NPCSlot[] slots;  // glisse les 3 slots ici
+    [SerializeField] private NPCSlot[] slots;
 
     [Header("NPC Pool")]
-    [SerializeField] private NPCData[] npcDataPool;  // tous les NPCData SO
+    [SerializeField] private NPCData[] npcDataPool;
 
     [Header("Spawn Timing")]
-    [SerializeField] private float minSpawnInterval = 5f;
-    [SerializeField] private float maxSpawnInterval = 12f;
+    [SerializeField] private float gameDuration = 600f;
+    [SerializeField] private float spawnIntervalStart = 10f;
+    [SerializeField] private float spawnIntervalEnd = 2f;
+    [SerializeField] private AnimationCurve difficultyCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
-    // Pool mélangé pour éviter les répétitions
     private readonly List<NPCData> _shuffledPool = new();
     private int _poolIndex;
+    private float _elapsedTime;
 
     private void Start()
     {
         ShufflePool();
+
+        // Spawn d'un seul NPC au lancement
+        TrySpawn();
+
         StartCoroutine(SpawnRoutine());
+    }
+
+    private void Update()
+    {
+        _elapsedTime += Time.deltaTime;
     }
 
     private IEnumerator SpawnRoutine()
     {
         while (true)
         {
-            float wait = Random.Range(minSpawnInterval, maxSpawnInterval);
-            yield return new WaitForSeconds(wait);
+            yield return new WaitForSeconds(GetCurrentInterval());
             TrySpawn();
         }
+    }
+
+    /// <summary>Returns the spawn interval based on elapsed time — decreases over the game duration.</summary>
+    private float GetCurrentInterval()
+    {
+        float t = Mathf.Clamp01(_elapsedTime / gameDuration);
+        return Mathf.Lerp(spawnIntervalStart, spawnIntervalEnd, difficultyCurve.Evaluate(t));
     }
 
     private void TrySpawn()
     {
         NPCSlot freeSlot = FindFreeSlot();
-        if (freeSlot == null) return;  // tous les slots sont occupés
+        if (freeSlot == null) return;
 
-        NPCData data = NextNPCData();
-        SpawnAt(freeSlot, data);
+        SpawnAt(freeSlot, NextNPCData());
     }
 
     private void SpawnAt(NPCSlot slot, NPCData data)
@@ -63,7 +79,14 @@ public class NPCSpawner : MonoBehaviour
         return null;
     }
 
-    // Fisher-Yates — garantit qu'on voit tous les personnages avant répétition
+    private NPCData NextNPCData()
+    {
+        if (_poolIndex >= _shuffledPool.Count)
+            ShufflePool();
+
+        return _shuffledPool[_poolIndex++];
+    }
+
     private void ShufflePool()
     {
         _shuffledPool.Clear();
@@ -76,13 +99,5 @@ public class NPCSpawner : MonoBehaviour
         }
 
         _poolIndex = 0;
-    }
-
-    private NPCData NextNPCData()
-    {
-        if (_poolIndex >= _shuffledPool.Count)
-            ShufflePool();
-
-        return _shuffledPool[_poolIndex++];
     }
 }
