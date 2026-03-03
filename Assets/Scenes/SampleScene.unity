@@ -1070,33 +1070,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f2510fb4bd5a97a41b39db91c3a16865, type: 2}
   - {fileID: 11400000, guid: 65cc6b41dcf567d45be938d2370f8589, type: 2}
   - {fileID: 11400000, guid: 03fb0ad472084cb4cba5a503b1674251, type: 2}
-  gameDuration: 600
-  spawnIntervalStart: 10
-  spawnIntervalEnd: 2
-  difficultyCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  initialPatienceDuration: 20
+  minPatienceDuration: 5
+  patienceReductionPerNPC: 0.5
 --- !u!4 &1766340893
 Transform:
   m_ObjectHideFlags: 0

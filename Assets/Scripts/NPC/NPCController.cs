@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,38 +9,120 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [Header("References")]
     [SerializeField] private Image characterImage;
     [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private Image patienceFill;
 
     [Header("Slide Animation")]
     [SerializeField] private AnimationCurve slideCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     [SerializeField] private float slideDistance = 300f;
     [SerializeField] private float slideDuration = 0.5f;
 
+    [Header("Patience Colors")]
+    [SerializeField] private Color colorHigh = Color.green;
+    [SerializeField] private Color colorMid = new Color(1f, 0.5f, 0f);
+    [SerializeField] private Color colorLow = Color.red;
+
+    // Événements écoutés par NPCSpawner
+    public event Action OnHalfPatience;
+    public event Action OnNPCLeft;
+
     private RectTransform _rectTransform;
     private NPCSlot _assignedSlot;
+    private float _maxPatience;
+    private float _currentPatience;
+    private bool _isActive;
+    private bool _halfTriggered;
 
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
     }
 
-    /// <summary>Sets up the NPC visuals and triggers the slide-in animation.</summary>
-    public void Initialize(NPCData data, NPCSlot slot)
+    /// <summary>Initialise le NPC avec ses données et sa durée de patience.</summary>
+    public void Initialize(NPCData data, NPCSlot slot, float patienceDuration)
     {
         _assignedSlot = slot;
         characterImage.sprite = data.sprite;
+        _maxPatience = patienceDuration;
+        _currentPatience = patienceDuration;
+        _isActive = false;
+        _halfTriggered = false;
+
+        UpdateGauge(1f);
         StartCoroutine(SlideRoutine(isIn: true));
     }
 
-    /// <summary>Triggers the slide-out animation then destroys the GameObject.</summary>
-    public void Dismiss()
+    private void Update()
     {
+        if (!_isActive) return;
+
+        _currentPatience -= Time.deltaTime;
+        float ratio = Mathf.Clamp01(_currentPatience / _maxPatience);
+
+        UpdateGauge(ratio);
+
+        // Déclenche le spawn du suivant à 50%
+        if (!_halfTriggered && ratio <= 0.5f)
+        {
+            _halfTriggered = true;
+            OnHalfPatience?.Invoke();
+        }
+
+        if (_currentPatience <= 0f)
+        {
+            _isActive = false;
+            TriggerAngry();
+        }
+    }
+
+    private void UpdateGauge(float ratio)
+    {
+        if (patienceFill == null) return;
+
+        patienceFill.fillAmount = ratio;
+
+        patienceFill.color = ratio > 0.5f
+            ? Color.Lerp(colorMid, colorHigh, (ratio - 0.5f) * 2f)
+            : Color.Lerp(colorLow, colorMid, ratio * 2f);
+
+        // Pulsation quand critique (< 25%)
+        if (ratio < 0.25f)
+        {
+            float pulse = (Mathf.Sin(Time.time * 8f) + 1f) * 0.5f;
+            patienceFill.transform.localScale = Vector3.one * Mathf.Lerp(1f, 1.15f, pulse);
+        }
+        else
+        {
+            patienceFill.transform.localScale = Vector3.one;
+        }
+    }
+
+
+    private void TriggerAngry()
+    {
+        // TODO : PlayerHealth.Instance?.LoseHeart();
+        Debug.Log($"[NPC] {gameObject.name} — patience épuisée, joueur perd un cœur.");
+        OnNPCLeft?.Invoke();
+        Dismiss();
+    }
+
+    /// <summary>Appelé quand la commande est correctement servie.</summary>
+    public void Serve()
+    {
+        if (!_isActive) return;
+        _isActive = false;
+        Debug.Log($"[NPC] {gameObject.name} — servi avec succès.");
+        OnNPCLeft?.Invoke();
+        Dismiss();
+    }
+
+    private void Dismiss()
+    {
+        _isActive = false;
         StartCoroutine(SlideRoutine(isIn: false));
     }
 
     private IEnumerator SlideRoutine(bool isIn)
     {
-        // Slide-in  : hidden position → slot position (0,0)
-        // Slide-out : slot position (0,0) → hidden position
         Vector2 slotPos = Vector2.zero;
         Vector2 hiddenPos = slotPos - new Vector2(0f, slideDistance);
 
@@ -64,25 +147,22 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _rectTransform.anchoredPosition = endPos;
         canvasGroup.alpha = endAlpha;
 
-        if (!isIn)
+        if (isIn)
+            _isActive = true;
+        else
         {
             _assignedSlot.Release();
             Destroy(gameObject);
         }
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
+
+    public void OnPointerEnter(PointerEventData eventData) =>
         CursorController.Instance?.SetState(CursorController.CursorState.Hover);
-    }
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
+    public void OnPointerExit(PointerEventData eventData) =>
         CursorController.Instance?.SetState(CursorController.CursorState.Default);
-    }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
+    public void OnPointerClick(PointerEventData eventData) =>
         Debug.Log($"[NPC] Clicked: {gameObject.name}");
-    }
 }

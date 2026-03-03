@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,45 +12,20 @@ public class NPCSpawner : MonoBehaviour
     [Header("NPC Pool")]
     [SerializeField] private NPCData[] npcDataPool;
 
-    [Header("Spawn Timing")]
-    [SerializeField] private float gameDuration = 600f;
-    [SerializeField] private float spawnIntervalStart = 10f;
-    [SerializeField] private float spawnIntervalEnd = 2f;
-    [SerializeField] private AnimationCurve difficultyCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [Header("Patience Duration")]
+    [SerializeField] private float initialPatienceDuration = 20f;
+    [SerializeField] private float minPatienceDuration = 5f;
+    [SerializeField] private float patienceReductionPerNPC = 0.5f;
 
     private readonly List<NPCData> _shuffledPool = new();
     private int _poolIndex;
-    private float _elapsedTime;
+    private float _currentPatienceDuration;
 
     private void Start()
     {
+        _currentPatienceDuration = initialPatienceDuration;
         ShufflePool();
-
-        // Spawn d'un seul NPC au lancement
         TrySpawn();
-
-        StartCoroutine(SpawnRoutine());
-    }
-
-    private void Update()
-    {
-        _elapsedTime += Time.deltaTime;
-    }
-
-    private IEnumerator SpawnRoutine()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(GetCurrentInterval());
-            TrySpawn();
-        }
-    }
-
-    /// <summary>Returns the spawn interval based on elapsed time — decreases over the game duration.</summary>
-    private float GetCurrentInterval()
-    {
-        float t = Mathf.Clamp01(_elapsedTime / gameDuration);
-        return Mathf.Lerp(spawnIntervalStart, spawnIntervalEnd, difficultyCurve.Evaluate(t));
     }
 
     private void TrySpawn()
@@ -69,7 +43,17 @@ public class NPCSpawner : MonoBehaviour
 
         NPCController npc = npcGO.GetComponent<NPCController>();
         slot.Assign();
-        npc.Initialize(data, slot);
+        npc.Initialize(data, slot, _currentPatienceDuration);
+
+        // Le spawn du suivant est lié à la jauge à 50%
+        npc.OnHalfPatience += TrySpawn;
+        npc.OnNPCLeft += TrySpawn;
+
+        // Réduit la durée pour le prochain NPC
+        _currentPatienceDuration = Mathf.Max(
+            minPatienceDuration,
+            _currentPatienceDuration - patienceReductionPerNPC
+        );
     }
 
     private NPCSlot FindFreeSlot()
@@ -83,7 +67,6 @@ public class NPCSpawner : MonoBehaviour
     {
         if (_poolIndex >= _shuffledPool.Count)
             ShufflePool();
-
         return _shuffledPool[_poolIndex++];
     }
 
