@@ -8,10 +8,11 @@ public class DragHandler : MonoBehaviour
     [Header("Config")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float dragHeight = 2f;
-    [SerializeField] private float dropMargin = 300f;
+    [SerializeField] private float dropMargin = 50f;
 
     public BeerItem DraggedBeer { get; private set; }
-    public bool IsDragging => DraggedBeer != null;
+    public ToppingItem DraggedTopping { get; private set; }
+    public bool IsDragging => DraggedBeer != null || DraggedTopping != null;
 
     private Vector3 _originPosition;
 
@@ -31,25 +32,55 @@ public class DragHandler : MonoBehaviour
 
         Plane plane = new Plane(Vector3.up, Vector3.up * dragHeight);
         if (plane.Raycast(ray, out float distance))
-            DraggedBeer.transform.position = ray.GetPoint(distance);
+        {
+            Vector3 worldPos = ray.GetPoint(distance);
+
+            if (DraggedBeer != null)
+                DraggedBeer.transform.position = worldPos;
+            else if (DraggedTopping != null)
+                DraggedTopping.transform.position = worldPos;
+        }
 
         if (!Mouse.current.leftButton.isPressed)
             Drop();
     }
 
-    /// <summary>Démarre le drag — mémorise la position d'origine.</summary>
+    /// <summary>Démarre le drag d'une bière.</summary>
     public void StartDrag(BeerItem beer)
     {
+        if (IsDragging) return;
         DraggedBeer = beer;
         _originPosition = beer.transform.position;
         CursorController.Instance?.SetState(CursorController.CursorState.Drag);
     }
 
+    /// <summary>Démarre le drag d'un topping.</summary>
+    public void StartToppingDrag(ToppingItem topping)
+    {
+        if (IsDragging) return;
+        DraggedTopping = topping;
+        _originPosition = topping.transform.position;
+        CursorController.Instance?.SetState(CursorController.CursorState.Drag);
+    }
+
     private void Drop()
     {
-        if (DraggedBeer == null) return;
+        if (!IsDragging) return;
 
         Vector2 mousePos = Mouse.current.position.ReadValue();
+
+        if (DraggedBeer != null)
+            DropBeer(mousePos);
+        else if (DraggedTopping != null)
+            DropTopping(mousePos);
+
+        CursorController.Instance?.SetState(CursorController.CursorState.Default);
+        DraggedBeer = null;
+        DraggedTopping = null;
+    }
+
+    private void DropBeer(Vector2 mousePos)
+    {
         NPCController closestNPC = FindNPCUnderMouse(mousePos);
 
         if (closestNPC != null)
@@ -60,16 +91,30 @@ public class DragHandler : MonoBehaviour
         }
         else
         {
-            DraggedBeer.transform.position = _originPosition;
+            if (DraggedBeer != null)
+                DraggedBeer.transform.position = _originPosition;
+        }
+    }
+
+    private void DropTopping(Vector2 mousePos)
+    {
+        BeerItem targetBeer = FindBeerUnderMouse(mousePos);
+
+        if (targetBeer != null)
+        {
+            targetBeer.AddTopping(DraggedTopping.GetToppingType());
+            Debug.Log($"[Topping] {DraggedTopping.GetToppingType()} ajouté à {targetBeer.BeerType}");
         }
 
-        CursorController.Instance?.SetState(CursorController.CursorState.Default);
-        DraggedBeer = null;
+        // Le topping revient toujours à sa place — stock infini
+        DraggedTopping.transform.position = _originPosition;
     }
 
     private NPCController FindNPCUnderMouse(Vector2 mousePos)
     {
         NPCController[] npcs = FindObjectsByType<NPCController>(FindObjectsSortMode.None);
+        NPCController closest = null;
+        float closestDist = float.MaxValue;
 
         foreach (NPCController npc in npcs)
         {
@@ -87,7 +132,30 @@ public class DragHandler : MonoBehaviour
 
             if (mousePos.x >= min.x && mousePos.x <= max.x &&
                 mousePos.y >= min.y && mousePos.y <= max.y)
-                return npc;
+            {
+                Vector2 center = (min + max) / 2f;
+                float dist = Vector2.Distance(mousePos, center);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closest = npc;
+                }
+            }
+        }
+
+        return closest;
+    }
+
+    private BeerItem FindBeerUnderMouse(Vector2 mousePos)
+    {
+        Ray ray = mainCamera.ScreenPointToRay(mousePos);
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+        {
+            if (hit.collider.TryGetComponent(out BeerItem beer))
+                return beer;
+
+            if (hit.collider.GetComponentInParent<BeerItem>() is BeerItem parentBeer)
+                return parentBeer;
         }
 
         return null;
