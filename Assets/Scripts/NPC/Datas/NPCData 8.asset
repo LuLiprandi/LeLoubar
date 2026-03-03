@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: NPCData 8
   m_EditorClassIdentifier: 
   npcName: Igor
-  sprite: {fileID: 21300000, guid: 3f9c8cd5d3e11224bbeadc37975d35dc, type: 3}
+  sprite: {fileID: 21300000, guid: 859452569fc5b6b4a823580970d2e033, type: 3}
   patienceMultiplier: 1

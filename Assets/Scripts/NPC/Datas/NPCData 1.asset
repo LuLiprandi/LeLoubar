@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: NPCData 1
   m_EditorClassIdentifier: 
   npcName: Barnabe
-  sprite: {fileID: 21300000, guid: 68055d7317821dc4e894d6e99005f8c2, type: 3}
+  sprite: {fileID: 21300000, guid: 89009f9c9e4f34949a4c2846ff5aa589, type: 3}
   patienceMultiplier: 1

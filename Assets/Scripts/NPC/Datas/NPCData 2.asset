@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: NPCData 2
   m_EditorClassIdentifier: 
   npcName: Cassandra
-  sprite: {fileID: 21300000, guid: 935261a9cef0dc24da22f0004d7c3b6e, type: 3}
+  sprite: {fileID: 21300000, guid: 9923e270b037b614b8ccbcc36f9579cb, type: 3}
   patienceMultiplier: 1

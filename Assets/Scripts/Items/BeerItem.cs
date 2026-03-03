@@ -4,7 +4,6 @@ public class BeerItem : MonoBehaviour, IClickable, IHoverable
 {
     public BeerType BeerType { get; private set; }
     public ToppingType Topping { get; private set; }
-    public bool IsBeingDragged { get; set; }
 
     /// <summary>Initialise la bière avec son type.</summary>
     public void Initialize(BeerType beerType)
@@ -14,12 +13,13 @@ public class BeerItem : MonoBehaviour, IClickable, IHoverable
     }
 
     /// <summary>Ajoute un topping à la bière.</summary>
-    public void AddTopping(ToppingType topping)
-    {
-        Topping = topping;
-    }
+    public void AddTopping(ToppingType topping) => Topping = topping;
 
-    public void OnClick() { }
+    public void OnClick()
+    {
+        if (DragHandler.Instance == null) return;
+        DragHandler.Instance.StartDrag(this);
+    }
 
     public void OnHoverEnter() =>
         CursorController.Instance?.SetState(CursorController.CursorState.Hover);

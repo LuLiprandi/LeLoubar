@@ -22,6 +22,9 @@ public class ClickInputHandler : MonoBehaviour
 
     private void Update()
     {
+        // Bloque le raycast pendant le drag
+        if (DragHandler.Instance != null && DragHandler.Instance.IsDragging) return;
+
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = mainCamera.ScreenPointToRay(mousePos);
 
@@ -41,12 +44,9 @@ public class ClickInputHandler : MonoBehaviour
 
         if (hoverable == _currentHovered) return;
 
-        // Exit previous
         _currentHovered?.OnHoverExit();
-
         _currentHovered = hoverable;
 
-        // Enter new
         if (_currentHovered != null)
         {
             _currentHovered.OnHoverEnter();

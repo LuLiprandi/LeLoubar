@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: NPCData 3
   m_EditorClassIdentifier: 
   npcName: Daniel
-  sprite: {fileID: 21300000, guid: d14479741e7932c4694d7fa645df369c, type: 3}
+  sprite: {fileID: 21300000, guid: 7f06c5dc38ec0d5458b050a89cd27adb, type: 3}
   patienceMultiplier: 1

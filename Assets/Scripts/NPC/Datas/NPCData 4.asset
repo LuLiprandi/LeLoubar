@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: NPCData 4
   m_EditorClassIdentifier: 
   npcName: Edouard
-  sprite: {fileID: 21300000, guid: 5a103211bcd059e4fbc970f41ffc931a, type: 3}
+  sprite: {fileID: 21300000, guid: 7f3062c783ac2584fb349edcd4188f1e, type: 3}
   patienceMultiplier: 1

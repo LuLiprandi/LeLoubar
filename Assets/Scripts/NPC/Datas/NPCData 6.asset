@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: NPCData 6
   m_EditorClassIdentifier: 
   npcName: Georges
-  sprite: {fileID: 21300000, guid: 62943ddf42bd4404ab4388687d649bb6, type: 3}
+  sprite: {fileID: 21300000, guid: 014c294713cabeb44bf43ccce03447db, type: 3}
   patienceMultiplier: 1

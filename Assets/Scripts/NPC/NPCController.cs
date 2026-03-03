@@ -35,6 +35,7 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     private float _currentPatience;
     private bool _isActive;
     private bool _halfTriggered;
+    private bool _isDismissed;
 
     private void Awake()
     {
@@ -50,8 +51,8 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _currentPatience = patienceDuration;
         _isActive = false;
         _halfTriggered = false;
+        _isDismissed = false;
 
-        // Génère et affiche la commande
         Order = NPCOrder.GenerateRandom();
         orderBubble?.Setup(Order);
 
@@ -104,7 +105,7 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     private void TriggerAngry()
     {
-        // TODO : PlayerHealth.Instance?.LoseHeart();
+        if (_isDismissed) return;
         Debug.Log($"[NPC] {gameObject.name} — patience épuisée.");
         OnNPCLeft?.Invoke();
         Dismiss();
@@ -113,15 +114,34 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     /// <summary>Appelé quand la commande est correctement servie.</summary>
     public void Serve()
     {
-        if (!_isActive) return;
+        if (_isDismissed) return;
         _isActive = false;
+        _isDismissed = true;
         Debug.Log($"[NPC] {gameObject.name} — servi avec succès.");
         OnNPCLeft?.Invoke();
         Dismiss();
     }
 
+    /// <summary>Tente de servir le NPC avec la bière donnée. Retourne true si correct.</summary>
+    public bool TryServe(BeerItem beer)
+    {
+        Debug.Log($"[TryServe] dismissed:{_isDismissed} | bière:{beer?.BeerType}/{beer?.Topping} | commande:{Order?.BeerType}/{Order?.Topping}");
+
+        if (_isDismissed || beer == null || Order == null) return false;
+
+        if (beer.BeerType == Order.BeerType && beer.Topping == Order.Topping)
+        {
+            Destroy(beer.gameObject);
+            Serve();
+            return true;
+        }
+
+        return false;
+    }
+
     private void Dismiss()
     {
+        _isDismissed = true;
         _isActive = false;
         StartCoroutine(SlideRoutine(isIn: false));
     }
@@ -167,6 +187,6 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public void OnPointerExit(PointerEventData eventData) =>
         CursorController.Instance?.SetState(CursorController.CursorState.Default);
 
-    public void OnPointerClick(PointerEventData eventData) =>
-        Debug.Log($"[NPC] Clicked: {gameObject.name}");
+    public void OnPointerClick(PointerEventData eventData) { }
 }
+
