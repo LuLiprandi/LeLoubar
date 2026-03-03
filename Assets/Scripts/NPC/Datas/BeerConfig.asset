@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53dabf1bdb49c2f4f843168d02f047d5, type: 3}
+  m_Name: BeerConfig
+  m_EditorClassIdentifier: 
+  blondePlain: {fileID: 21300000, guid: 8ffba5fd5ef888f47bdaf9fd90056672, type: 3}
+  blondeCigarette: {fileID: 21300000, guid: bfb01eb8ca657894d91033a6c6500089, type: 3}
+  blondePill: {fileID: 21300000, guid: f2babfc7fb46469448aa9dfcf3f97881, type: 3}
+  amberPlain: {fileID: 21300000, guid: afe503424153b1f4dbb27d76f2831725, type: 3}
+  amberCigarette: {fileID: 21300000, guid: 4d9463fea20a8884db8b3806803deed4, type: 3}
+  amberPill: {fileID: 21300000, guid: 9b9cfa3e11657944c91a4a187549334d, type: 3}
+  redPlain: {fileID: 21300000, guid: 130c9a34a06d3924a9aacc9ea4fd366d, type: 3}
+  redCigarette: {fileID: 21300000, guid: 174ff4a1871c27c47bae211380dbc35e, type: 3}
+  redPill: {fileID: 21300000, guid: 15ac5d4b03201174b8f6e8acd7b16b2f, type: 3}

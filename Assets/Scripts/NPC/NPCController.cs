@@ -11,6 +11,9 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Image patienceFill;
 
+    [Header("Order")]
+    [SerializeField] private OrderBubble orderBubble;
+
     [Header("Slide Animation")]
     [SerializeField] private AnimationCurve slideCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     [SerializeField] private float slideDistance = 300f;
@@ -21,7 +24,8 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private Color colorMid = new Color(1f, 0.5f, 0f);
     [SerializeField] private Color colorLow = Color.red;
 
-    // Événements écoutés par NPCSpawner
+    public NPCOrder Order { get; private set; }
+
     public event Action OnHalfPatience;
     public event Action OnNPCLeft;
 
@@ -47,6 +51,10 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _isActive = false;
         _halfTriggered = false;
 
+        // Génère et affiche la commande
+        Order = NPCOrder.GenerateRandom();
+        orderBubble?.Setup(Order);
+
         UpdateGauge(1f);
         StartCoroutine(SlideRoutine(isIn: true));
     }
@@ -60,7 +68,6 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         UpdateGauge(ratio);
 
-        // Déclenche le spawn du suivant à 50%
         if (!_halfTriggered && ratio <= 0.5f)
         {
             _halfTriggered = true;
@@ -84,7 +91,6 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             ? Color.Lerp(colorMid, colorHigh, (ratio - 0.5f) * 2f)
             : Color.Lerp(colorLow, colorMid, ratio * 2f);
 
-        // Pulsation quand critique (< 25%)
         if (ratio < 0.25f)
         {
             float pulse = (Mathf.Sin(Time.time * 8f) + 1f) * 0.5f;
@@ -96,11 +102,10 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         }
     }
 
-
     private void TriggerAngry()
     {
         // TODO : PlayerHealth.Instance?.LoseHeart();
-        Debug.Log($"[NPC] {gameObject.name} — patience épuisée, joueur perd un cœur.");
+        Debug.Log($"[NPC] {gameObject.name} — patience épuisée.");
         OnNPCLeft?.Invoke();
         Dismiss();
     }
@@ -155,7 +160,6 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             Destroy(gameObject);
         }
     }
-
 
     public void OnPointerEnter(PointerEventData eventData) =>
         CursorController.Instance?.SetState(CursorController.CursorState.Hover);
