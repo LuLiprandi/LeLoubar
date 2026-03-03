@@ -24,19 +24,12 @@ public class CursorController : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // Hide the OS cursor — our UI image replaces it
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
     }
 
     private void Update()
     {
-        MoveCursorToMousePosition();
-    }
-
-    private void MoveCursorToMousePosition()
-    {
-        // Reuse the same Vector2 read — no allocation
         cursorRect.position = Mouse.current.position.ReadValue();
     }
 
