@@ -33,12 +33,8 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
     {
         IsProducing = true;
 
-        // Animation levier — descend
         yield return StartCoroutine(AnimateLever(leverAngle));
-
         yield return new WaitForSeconds(BrewDurationSeconds);
-
-        // Animation levier — remonte
         yield return StartCoroutine(AnimateLever(0f));
 
         SpawnBeer();
@@ -57,7 +53,7 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
+            float t = Mathf.Clamp01(elapsed / duration);
             leverTransform.localRotation = Quaternion.Lerp(startRot, targetRot, t);
             yield return null;
         }
@@ -67,6 +63,8 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
 
     private void SpawnBeer()
     {
+        Debug.Log($"[BeerTap] SpawnBeer — Prefab: {beerPrefab}, Point: {beerSpawnPoint?.position}");
+
         if (beerPrefab == null || beerSpawnPoint == null)
         {
             Debug.LogWarning("[BeerTap] Prefab ou SpawnPoint manquant.");

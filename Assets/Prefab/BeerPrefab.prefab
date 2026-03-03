@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4794204251023462029}
+  - component: {fileID: 5657803624326223665}
+  - component: {fileID: 5466511360215736329}
   m_Layer: 0
   m_Name: BeerPrefab
   m_TagString: Untagged
@@ -32,6 +34,39 @@ Transform:
   - {fileID: 4415406975052091590}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5657803624326223665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3529263128078141944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1393f168a51bc1e468f40a999bddb4a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &5466511360215736329
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3529263128078141944}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &4236783625304962861
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -54,15 +89,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eae3f7ba19425844b9634738a99012a3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.080073
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eae3f7ba19425844b9634738a99012a3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 47.010166
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eae3f7ba19425844b9634738a99012a3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -82.39447
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: eae3f7ba19425844b9634738a99012a3, type: 3}
       propertyPath: m_LocalRotation.w
