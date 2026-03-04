@@ -23,6 +23,10 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
     [SerializeField] private Image gaugeImage;
     [SerializeField] private RectTransform gaugeRect;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip pourClip;
+
     private Quaternion _initialRotation;
     public bool IsProducing { get; private set; }
 
@@ -44,6 +48,9 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
     private IEnumerator BrewRoutine()
     {
         IsProducing = true;
+
+        if (pourClip != null && audioSource != null)
+            audioSource.PlayOneShot(pourClip);
 
         if (gaugeImage != null)
         {
