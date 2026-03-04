@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -81,6 +82,16 @@ public class DragHandler : MonoBehaviour
 
     private void DropBeer(Vector2 mousePos)
     {
+        // Poubelle en priorité
+        TrashCan trash = FindObjectsByType<TrashCan>(FindObjectsSortMode.None)
+            .FirstOrDefault(t => t.IsUnderMouse(mousePos));
+
+        if (trash != null)
+        {
+            Destroy(DraggedBeer.gameObject);
+            return;
+        }
+
         NPCController closestNPC = FindNPCUnderMouse(mousePos);
 
         if (closestNPC != null)
@@ -106,7 +117,6 @@ public class DragHandler : MonoBehaviour
             Debug.Log($"[Topping] {DraggedTopping.GetToppingType()} ajouté à {targetBeer.BeerType}");
         }
 
-        // Le topping revient toujours à sa place — stock infini
         DraggedTopping.transform.position = _originPosition;
     }
 

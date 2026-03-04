@@ -11,6 +11,9 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
     [SerializeField] private GameObject beerPrefab;
     [SerializeField] private Transform beerSpawnPoint;
 
+    [Header("Spawn Rotation Override")]
+    [SerializeField] private Vector3 spawnRotationEuler = new Vector3(90f, 0f, 0f);
+
     [Header("Lever Animation")]
     [SerializeField] private Transform leverTransform;
     [SerializeField] private float leverAngle = 30f;
@@ -59,7 +62,6 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
             {
                 gaugeImage.fillAmount = elapsed / BrewDurationSeconds;
 
-                // Positionne la jauge au-dessus du levier en screen space
                 if (gaugeRect != null)
                 {
                     Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * 0.5f);
@@ -106,7 +108,8 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
             return;
         }
 
-        GameObject beerGO = Instantiate(beerPrefab, beerSpawnPoint.position, beerSpawnPoint.rotation);
+        Quaternion spawnRotation = Quaternion.Euler(spawnRotationEuler);
+        GameObject beerGO = Instantiate(beerPrefab, beerSpawnPoint.position, spawnRotation);
 
         if (beerGO.TryGetComponent(out BeerItem beerItem))
             beerItem.Initialize(beerType);
@@ -118,4 +121,3 @@ public class BeerTap : MonoBehaviour, IClickable, IHoverable
     public void OnHoverExit() =>
         CursorController.Instance?.SetState(CursorController.CursorState.Default);
 }
-
