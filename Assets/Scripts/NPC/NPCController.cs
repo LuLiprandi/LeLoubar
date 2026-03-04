@@ -107,6 +107,7 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if (_isDismissed) return;
         Debug.Log($"[NPC] {gameObject.name} — patience épuisée.");
+        GameManager.Instance?.LoseHeart();
         OnNPCLeft?.Invoke();
         Dismiss();
     }
@@ -118,6 +119,7 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _isActive = false;
         _isDismissed = true;
         Debug.Log($"[NPC] {gameObject.name} — servi avec succès.");
+        GameManager.Instance?.AddMoney();
         OnNPCLeft?.Invoke();
         Dismiss();
     }
@@ -125,8 +127,6 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     /// <summary>Tente de servir le NPC avec la bière donnée. Retourne true si correct.</summary>
     public bool TryServe(BeerItem beer)
     {
-        Debug.Log($"[TryServe] dismissed:{_isDismissed} | bière:{beer?.BeerType}/{beer?.Topping} | commande:{Order?.BeerType}/{Order?.Topping}");
-
         if (_isDismissed || beer == null || Order == null) return false;
 
         if (beer.BeerType == Order.BeerType && beer.Topping == Order.Topping)
@@ -189,4 +189,3 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerClick(PointerEventData eventData) { }
 }
-
