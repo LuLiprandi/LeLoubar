@@ -159,7 +159,7 @@ public class DragHandler : MonoBehaviour
     private BeerItem FindBeerUnderMouse(Vector2 mousePos)
     {
         Ray ray = mainCamera.ScreenPointToRay(mousePos);
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+        if (Physics.Raycast(ray, out RaycastHit hit, 1500f))
         {
             if (hit.collider.TryGetComponent(out BeerItem beer))
                 return beer;
