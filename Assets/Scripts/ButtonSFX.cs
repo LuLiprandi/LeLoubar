@@ -1,16 +1,24 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class ButtonSFX : MonoBehaviour
+[RequireComponent(typeof(Button))]
+public class ButtonSFX : MonoBehaviour, IPointerEnterHandler
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip hoverClip;
+    [SerializeField] private AudioClip clickClip;
+
+    private void Awake()
     {
-        
+        GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (clickClip != null) audioSource.PlayOneShot(clickClip);
+        });
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        
+        if (hoverClip != null) audioSource.PlayOneShot(hoverClip);
     }
 }
