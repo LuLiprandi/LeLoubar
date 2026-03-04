@@ -12,8 +12,15 @@ public class HUDController : MonoBehaviour
     [SerializeField] private Sprite[] hitSprites;
     [SerializeField] private float hitDisplayDuration = 1.5f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip punchClip;
+    [SerializeField] private AudioClip gunClip;
+    [SerializeField] private AudioClip slashClip;
+
     private int _currentHearts;
     private Coroutine _hitRoutine;
+    private CanvasGroup _hitCanvasGroup;
 
     private void Awake()
     {
@@ -21,7 +28,14 @@ public class HUDController : MonoBehaviour
         RefreshHearts();
 
         if (hitFeedbackImage != null)
-            hitFeedbackImage.gameObject.SetActive(false);
+        {
+            _hitCanvasGroup = hitFeedbackImage.gameObject.GetComponent<CanvasGroup>();
+            if (_hitCanvasGroup == null)
+                _hitCanvasGroup = hitFeedbackImage.gameObject.AddComponent<CanvasGroup>();
+
+            _hitCanvasGroup.alpha = 0f;
+            hitFeedbackImage.gameObject.SetActive(true);
+        }
     }
 
     private void Start()
@@ -58,12 +72,30 @@ public class HUDController : MonoBehaviour
 
     private IEnumerator HitFeedbackRoutine()
     {
-        hitFeedbackImage.sprite = hitSprites[Random.Range(0, hitSprites.Length)];
-        hitFeedbackImage.gameObject.SetActive(true);
+        int index = Random.Range(0, hitSprites.Length);
+        hitFeedbackImage.sprite = hitSprites[index];
+        _hitCanvasGroup.alpha = 1f;
+
+        PlayHitSound(index);
 
         yield return new WaitForSeconds(hitDisplayDuration);
 
-        hitFeedbackImage.gameObject.SetActive(false);
+        _hitCanvasGroup.alpha = 0f;
         _hitRoutine = null;
+    }
+
+    private void PlayHitSound(int spriteIndex)
+    {
+        if (audioSource == null) return;
+
+        AudioClip clip = spriteIndex switch
+        {
+            0 => punchClip,
+            1 => gunClip,
+            2 => slashClip,
+            _ => punchClip
+        };
+
+        if (clip != null) audioSource.PlayOneShot(clip);
     }
 }
