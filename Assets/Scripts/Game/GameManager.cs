@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    private const float SessionDurationSeconds = 300f; // 10 minutes
+    private const float SessionDurationSeconds = 300f;
     private const int MoneyObjective = 1000;
     private const int StartingHearts = 3;
     private const int MoneyPerBeer = 50;
@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
     public int Hearts { get; private set; }
     public bool IsGameOver { get; private set; }
     public bool IsVictory { get; private set; }
+
+    /// <summary>Returns a value from 0 (game start) to 1 (game end).</summary>
+    public float GameProgress => 1f - Mathf.Clamp01(TimeRemaining / SessionDurationSeconds);
 
     public event Action<int> OnMoneyChanged;
     public event Action<int> OnHeartsChanged;

@@ -53,7 +53,9 @@ public class NPCController : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         _halfTriggered = false;
         _isDismissed = false;
 
-        Order = NPCOrder.GenerateRandom();
+        // Generate order based on how far into the game session we are.
+        float progress = GameManager.Instance != null ? GameManager.Instance.GameProgress : 0f;
+        Order = NPCOrder.GenerateRandom(progress);
         orderBubble?.Setup(Order);
 
         UpdateGauge(1f);
